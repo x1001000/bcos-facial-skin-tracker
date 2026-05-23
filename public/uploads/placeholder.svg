@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde2cf"/>
+      <stop offset="100%" stop-color="#f0bfa2"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="#f8f5f2"/>
+  <ellipse cx="200" cy="240" rx="120" ry="160" fill="url(#g)"/>
+  <ellipse cx="160" cy="220" rx="8" ry="5" fill="#3b2a1a"/>
+  <ellipse cx="240" cy="220" rx="8" ry="5" fill="#3b2a1a"/>
+  <path d="M 165 300 Q 200 320 235 300" stroke="#a8633f" stroke-width="3" fill="none"/>
+  <text x="200" y="460" text-anchor="middle" font-family="ui-sans-serif" font-size="14" fill="#888">seeded synthetic visit</text>
+</svg>
