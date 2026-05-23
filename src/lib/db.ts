@@ -5,8 +5,9 @@ import fs from "fs";
 import type { SkinProfile, Region } from "./types";
 import { evaluateRules } from "./rules/treatment";
 
-const DB_PATH = path.join(process.cwd(), "bcos.db");
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+const DB_PATH = process.env.BCOS_DB_PATH ?? path.join(process.cwd(), "bcos.db");
+const UPLOADS_DIR =
+  process.env.BCOS_UPLOADS_DIR ?? path.join(process.cwd(), "public", "uploads");
 
 let _db: Database.Database | null = null;
 

@@ -6,7 +6,8 @@ import { getDb } from "@/lib/db";
 import type { SkinProfile } from "@/lib/types";
 import { evaluateRules } from "@/lib/rules/treatment";
 
-const UPLOADS = path.join(process.cwd(), "public", "uploads");
+const UPLOADS =
+  process.env.BCOS_UPLOADS_DIR ?? path.join(process.cwd(), "public", "uploads");
 
 export async function POST(
   req: Request,
