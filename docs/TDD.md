@@ -35,7 +35,7 @@
                         │
                         ▼
                 ┌────────────────────────────────┐
-                │  Next.js server (Vercel/local) │
+                │  Next.js server (Fly.io/local) │
                 │                                │
                 │  write JPEG to public/uploads  │
                 │  write landmarks.json          │
@@ -139,7 +139,7 @@ The data model has been intentionally kept thin (5 tables): `patients`, `consent
 
 ## Tech stack and why
 
-- **Next.js 16 App Router + TypeScript:** SSR for the simple patient list pages, client components where we need the camera. Deploys to Vercel in one command.
+- **Next.js 16 App Router + TypeScript:** SSR for the simple patient list pages, client components where we need the camera. Containerized and deployed to Fly.io with a persistent volume for the SQLite DB and uploads.
 - **MediaPipe Tasks Vision (Face Landmarker, GPU delegate):** 478 3D landmarks, runs at 30fps in the browser. Mature, well-documented, no server inference required.
 - **better-sqlite3:** Synchronous SQLite. Perfect for a single-clinic prototype. Schema migrates to Postgres later without rewriting code.
 - **Recharts:** Per-region metric line charts. Light, declarative.

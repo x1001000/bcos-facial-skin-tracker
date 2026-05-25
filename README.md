@@ -6,7 +6,7 @@ AI Fund Build Challenge submission. Standardized facial photo intake, quantified
 - [PRD](docs/PRD.md) — target user, workflow, wedge-to-platform path
 - [TDD](docs/TDD.md) — imaging pipeline, photo-consistency controls, rules engine
 - [Authorship note](docs/AUTHORSHIP.md) — what I built, reused, broke, debugged
-- [Demo script](docs/DEMO_SCRIPT.md) — 3-minute walkthrough
+- [Demo script](docs/DEMO_SCRIPT.md) — 3-minute walkthrough (TBD)
 
 ## Quick start
 
@@ -15,15 +15,9 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. Two synthetic patients are seeded on first launch (delete `bcos.db` to reset).
+Open http://localhost:3000. The patient roster starts empty — add a patient and run the intake flow to populate it.
 
 A modern browser with camera access (Chrome or Safari) is required for the intake page. MediaPipe Face Landmarker WASM is loaded from the public CDN at first use.
-
-## What's real vs. synthetic in the demo
-
-- **Real:** vision pipeline (CIELAB, texture, pore proxy, wrinkle proxy, pose estimation), capture-time gating, rule engine, all UI, DB.
-- **Real on capture:** when you take a live photo on `/intake/[patientId]`, the full skin profile is computed in your browser from the real image data.
-- **Synthetic:** the two seed patients' three-visit histories use placeholder face SVGs and profile metrics generated to produce realistic-looking trends (right-cheek redness drift, forehead texture improvement). This is so the comparison view and treatment planner have something to demo against on a fresh install. Once you take a real photo, real metrics enter the dataset.
 
 ## Known limitations
 
@@ -37,4 +31,4 @@ Next.js 16 (App Router) · TypeScript · Tailwind v4 · MediaPipe Tasks Vision (
 
 ## Deploy
 
-Tested for Vercel. `npm run build` succeeds with zero TypeScript errors. The DB file (`bcos.db`) is created on first request in the project root; for Vercel you would swap to Postgres + signed-URL blob storage (TDD discusses the migration).
+Deployed to Fly.io with a persistent volume mounted at `/data` for `bcos.db` and uploaded images (`fly.toml`, `Dockerfile`, `docker-entrypoint.sh`). `npm run build` succeeds with zero TypeScript errors. For a multi-clinic production deploy you would swap SQLite for Postgres and the local volume for signed-URL blob storage (TDD discusses the migration).

@@ -32,7 +32,7 @@ With BCOS:
 - **Explainable rules over a black-box score.** Aestheticians and MDs justify treatment decisions to patients and to each other. A suggestion that says "right-cheek a\* up 1.8 vs baseline → consider anti-inflammatory regimen" is reviewable. A skin-score-of-72 is not.
 - **Landmark-anchored ROIs.** Visit-to-visit pose is never identical. By defining ROIs as polygons over MediaPipe FaceMesh landmark indices, we always measure the same anatomical patch even when the head moves a few degrees.
 - **Editable suggestions, not autopilot.** The clinician is always the author of the treatment plan. The product produces a draft, the staff edits, accepts, or rejects — and the rejection reason is captured, which becomes the training signal for later iterations.
-- **Mandarin-first.** Taiwan clinics run in Mandarin. Toggle is in the header, default is `zh-TW`.
+- **Bilingual UX.** Taiwan clinics need Mandarin support; reviewers and visitors arrive in English. Toggle is in the header (`en` / `zh-TW`); default is `en` and the choice persists per browser.
 
 ## Why this is the wedge
 
