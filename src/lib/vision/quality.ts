@@ -11,8 +11,8 @@ export type QualityFrame = {
 export const QUALITY_TARGETS = {
   yawAbs: 8,
   pitchAbs: 8,
-  ipdMin: 180,
-  ipdMax: 320,
+  ipdMin: 140,
+  ipdMax: 220,
   luminanceMin: 45,
   luminanceMax: 75,
   blurMin: 60,
