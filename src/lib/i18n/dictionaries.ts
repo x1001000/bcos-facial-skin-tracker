@@ -1,6 +1,6 @@
 export type Lang = "en" | "zh-TW";
 
-export const DEFAULT_LANG: Lang = "zh-TW";
+export const DEFAULT_LANG: Lang = "en";
 
 export const dict = {
   en: {
