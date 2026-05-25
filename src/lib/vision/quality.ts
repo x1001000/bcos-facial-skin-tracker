@@ -13,8 +13,8 @@ export const QUALITY_TARGETS = {
   pitchAbs: 8,
   ipdMin: 140,
   ipdMax: 220,
-  luminanceMin: 45,
-  luminanceMax: 75,
+  luminanceMin: 30,
+  luminanceMax: 85,
   blurMin: 60,
 };
 
