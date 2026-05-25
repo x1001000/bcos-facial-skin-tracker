@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n/provider";
 import { MetricChart } from "@/components/MetricChart";
 import type { Patient, Visit, Consent, SkinProfile, RegionMetrics } from "@/lib/types";
@@ -15,10 +16,24 @@ const METRICS: (keyof RegionMetrics)[] = ["L", "a", "b", "texture", "pore", "wri
 export default function PatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { t } = useI18n();
+  const router = useRouter();
   const [data, setData] = useState<Data | null>(null);
   const [metric, setMetric] = useState<keyof RegionMetrics>("a");
   const [aIdx, setAIdx] = useState(0);
   const [bIdx, setBIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!window.confirm(t("patient_delete_confirm"))) return;
+    setDeleting(true);
+    const res = await fetch(`/api/patients/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      router.push("/patients");
+    } else {
+      setDeleting(false);
+      alert(`delete failed: ${res.status}`);
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/patients/${id}`).then((r) => r.json()).then((d: Data) => {
@@ -65,7 +80,7 @@ export default function PatientPage({ params }: { params: Promise<{ id: string }
             {data.patient.notes ?? ""}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href={`/patients/${id}/plan`}
             className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
@@ -78,6 +93,13 @@ export default function PatientPage({ params }: { params: Promise<{ id: string }
           >
             + {t("nav_new_visit")}
           </Link>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-md border border-rose-300 bg-white px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+          >
+            {deleting ? "…" : t("patient_delete")}
+          </button>
         </div>
       </div>
 

@@ -16,6 +16,9 @@ export const dict = {
     patient_notes: "Notes",
     save: "Save",
     cancel: "Cancel",
+    patient_delete: "Delete patient",
+    patient_delete_confirm:
+      "Delete this patient and all their visits? This cannot be undone.",
     timeline_title: "Visit timeline",
     timeline_compare: "Compare visits",
     timeline_baseline: "Baseline",
@@ -96,6 +99,8 @@ export const dict = {
     patient_notes: "備註",
     save: "儲存",
     cancel: "取消",
+    patient_delete: "刪除病患",
+    patient_delete_confirm: "確定刪除此病患及其所有就診紀錄？此操作無法復原。",
     timeline_title: "就診時間軸",
     timeline_compare: "比較就診",
     timeline_baseline: "基準",
