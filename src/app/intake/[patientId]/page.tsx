@@ -10,8 +10,19 @@ import { estimatePose, frameQualityPasses, QUALITY_TARGETS } from "@/lib/vision/
 import { laplacianVariance, luma } from "@/lib/vision/metrics";
 import { buildProfile } from "@/lib/vision/profile";
 
-const PREVIEW_W = 480;
-const PREVIEW_H = 360;
+const PREVIEW_W = 360;
+const PREVIEW_H = 480;
+
+// Returns the source rect to draw from `v` so it covers a target aspect ratio (center-crop).
+function coverCrop(vw: number, vh: number, targetAR: number) {
+  const sourceAR = vw / vh;
+  if (sourceAR > targetAR) {
+    const sw = vh * targetAR;
+    return { sx: (vw - sw) / 2, sy: 0, sw, sh: vh };
+  }
+  const sh = vw / targetAR;
+  return { sx: 0, sy: (vh - sh) / 2, sw: vw, sh };
+}
 
 export default function IntakePage({ params }: { params: Promise<{ patientId: string }> }) {
   const { patientId } = use(params);
@@ -93,9 +104,11 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
         return;
       }
       // Mirror preview canvas horizontally so the patient-facing display matches expectations.
+      // Center-crop so portrait phone cameras and landscape webcams both fill the portrait box.
+      const { sx, sy, sw, sh } = coverCrop(v.videoWidth, v.videoHeight, PREVIEW_W / PREVIEW_H);
       pctx.save();
       pctx.scale(-1, 1);
-      pctx.drawImage(v, -PREVIEW_W, 0, PREVIEW_W, PREVIEW_H);
+      pctx.drawImage(v, sx, sy, sw, sh, -PREVIEW_W, 0, PREVIEW_W, PREVIEW_H);
       pctx.restore();
 
       const lm = await getLandmarker();
@@ -107,7 +120,7 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
       octx.lineWidth = 2;
       octx.setLineDash([6, 4]);
       octx.beginPath();
-      octx.ellipse(PREVIEW_W / 2, PREVIEW_H / 2, 110, 150, 0, 0, Math.PI * 2);
+      octx.ellipse(PREVIEW_W / 2, PREVIEW_H / 2, 130, 180, 0, 0, Math.PI * 2);
       octx.stroke();
       octx.setLineDash([]);
 
@@ -172,17 +185,18 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
     const v = videoRef.current;
     if (!v) return;
     const lm = await getLandmarker();
-    // Capture a high-res still — match the source video.
-    const w = v.videoWidth || 1280;
-    const h = v.videoHeight || 720;
+    // Capture a high-res still, center-cropped to match the portrait preview the user saw.
+    const vw = v.videoWidth || 1280;
+    const vh = v.videoHeight || 720;
+    const { sx, sy, sw, sh } = coverCrop(vw, vh, PREVIEW_W / PREVIEW_H);
     const c = document.createElement("canvas");
-    c.width = w;
-    c.height = h;
+    c.width = Math.round(sw);
+    c.height = Math.round(sh);
     const ctx = c.getContext("2d", { willReadFrequently: true })!;
     // Mirror to match preview orientation
     ctx.save();
     ctx.scale(-1, 1);
-    ctx.drawImage(v, -w, 0, w, h);
+    ctx.drawImage(v, sx, sy, sw, sh, -c.width, 0, c.width, c.height);
     ctx.restore();
     const result = lm.detect(c);
     if (!result.faceLandmarks.length) {
@@ -190,7 +204,7 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
       return;
     }
     const landmarks = result.faceLandmarks[0].map((l) => ({ x: l.x, y: l.y, z: l.z }));
-    const imageData = ctx.getImageData(0, 0, w, h);
+    const imageData = ctx.getImageData(0, 0, c.width, c.height);
     const profile = buildProfile(imageData, landmarks);
     const dataUrl = c.toDataURL("image/jpeg", 0.85);
     setCapturedImage(dataUrl);
@@ -214,7 +228,7 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
   }, [patientId, router]);
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8 space-y-4">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 space-y-4">
       <Link href={`/patients/${patientId}`} className="text-xs text-zinc-500 hover:underline">
         ← back
       </Link>
@@ -230,8 +244,11 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
         </div>
       )}
 
-      <div className="rounded-lg border border-zinc-200 bg-black p-3 shadow-sm">
-        <div className="relative mx-auto" style={{ width: PREVIEW_W, height: PREVIEW_H }}>
+      <div className="rounded-lg border border-zinc-200 bg-black p-2 sm:p-3 shadow-sm">
+        <div
+          className="relative mx-auto w-full"
+          style={{ maxWidth: PREVIEW_W, aspectRatio: `${PREVIEW_W} / ${PREVIEW_H}` }}
+        >
           {/* Hidden source video */}
           <video
             ref={videoRef}
@@ -239,8 +256,8 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
             muted
             className="hidden"
           />
-          <canvas ref={previewCanvasRef} className="absolute inset-0" />
-          <canvas ref={overlayRef} className="absolute inset-0 pointer-events-none" />
+          <canvas ref={previewCanvasRef} className="absolute inset-0 h-full w-full" />
+          <canvas ref={overlayRef} className="absolute inset-0 h-full w-full pointer-events-none" />
           {!ready && (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-zinc-200">
               {t("intake_loading_model")}
