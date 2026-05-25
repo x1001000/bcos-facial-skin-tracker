@@ -184,7 +184,11 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
   const capture = useCallback(async () => {
     const v = videoRef.current;
     if (!v) return;
-    const lm = await getLandmarker();
+    const live = lastLandmarksRef.current;
+    if (!live) {
+      setError("face lost at capture moment");
+      return;
+    }
     // Capture a high-res still, center-cropped to match the portrait preview the user saw.
     const vw = v.videoWidth || 1280;
     const vh = v.videoHeight || 720;
@@ -198,12 +202,10 @@ export default function IntakePage({ params }: { params: Promise<{ patientId: st
     ctx.scale(-1, 1);
     ctx.drawImage(v, sx, sy, sw, sh, -c.width, 0, c.width, c.height);
     ctx.restore();
-    const result = lm.detect(c);
-    if (!result.faceLandmarks.length) {
-      setError("face lost at capture moment");
-      return;
-    }
-    const landmarks = result.faceLandmarks[0].map((l) => ({ x: l.x, y: l.y, z: l.z }));
+    // Reuse the most recent landmarks from the live VIDEO-mode loop.
+    // Landmarks are normalized to the cover-cropped frame, which is identical
+    // between the preview and this capture canvas.
+    const landmarks = live.map((l) => ({ x: l.x, y: l.y, z: l.z }));
     const imageData = ctx.getImageData(0, 0, c.width, c.height);
     const profile = buildProfile(imageData, landmarks);
     const dataUrl = c.toDataURL("image/jpeg", 0.85);
