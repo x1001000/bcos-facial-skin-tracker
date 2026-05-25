@@ -35,12 +35,12 @@ export async function POST(
   const buf = Buffer.from(m[2], "base64");
   const visitId = randomUUID();
   await fs.mkdir(UPLOADS, { recursive: true });
-  const imgRel = `/uploads/${visitId}.${ext}`;
+  const imgRel = `/api/uploads/${visitId}.${ext}`;
   await fs.writeFile(path.join(UPLOADS, `${visitId}.${ext}`), buf);
 
   let landmarksRel: string | null = null;
   if (body.landmarks) {
-    landmarksRel = `/uploads/${visitId}.landmarks.json`;
+    landmarksRel = `/api/uploads/${visitId}.landmarks.json`;
     await fs.writeFile(
       path.join(UPLOADS, `${visitId}.landmarks.json`),
       JSON.stringify(body.landmarks),
